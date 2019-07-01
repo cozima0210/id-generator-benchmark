@@ -1,0 +1,3 @@
+GET  /       controllers.Test1Controller.get
+POST /test1  controllers.Test1Controller.create
+POST /test2  controllers.Test2Controller.create
