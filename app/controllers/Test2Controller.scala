@@ -1,14 +1,18 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-import models.{IdGenerator, Test2}
-import play.api.mvc.InjectedController
+import models.{Id, IdGenerator, Test2, Test2Repository}
+import play.api.mvc.{Action, AnyContent, InjectedController}
+
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class Test2Controller @Inject()(implicit idGenerator: IdGenerator) extends InjectedController {
+class Test2Controller @Inject()(test2Repository: Test2Repository)(
+  implicit ec:                                   ExecutionContext,
+  idGenerator:                                   IdGenerator)
+  extends InjectedController {
 
-  def create = Action { implicit request =>
-    Test2.create("hoge")
-    Ok
+  def create: Action[AnyContent] = Action.async { implicit request =>
+    test2Repository.create(Id.generate[Test2], "hoge").map(_ => Ok)
   }
 }

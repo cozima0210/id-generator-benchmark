@@ -2,8 +2,9 @@ package models
 
 import com.google.common.io.BaseEncoding
 import com.google.common.primitives.Longs
+import slick.lifted.MappedTo
 
-case class Id[A <: HasId[A]](value: Long) extends AnyVal {
+case class Id[A <: HasId[A]](value: Long) extends MappedTo[Long] {
 
   override def toString: String = BaseEncoding.base32Hex.encode(Longs.toByteArray(value))
 
@@ -11,7 +12,7 @@ case class Id[A <: HasId[A]](value: Long) extends AnyVal {
 
 object Id {
 
-  def apply[A <: HasId[A]](implicit idGenerator: IdGenerator): Id[A] = Id[A](idGenerator.generate)
+  def generate[A <: HasId[A]](implicit idGenerator: IdGenerator): Id[A] = Id[A](idGenerator.generate)
 
   def from[A <: HasId[A]](string: String): Id[A] = {
     val bytes = BaseEncoding.base32Hex.decode(string)

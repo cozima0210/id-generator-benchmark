@@ -1,6 +1,6 @@
 package models
 
-case class IdGenerator(workerId: Long = 1, datacenterId: Long = 3, var sequence: Long = 0L) {
+case class IdGenerator(workerId: Long = 1, datacenterId: Long = 2, var sequence: Long = 0L) {
 
   val twepoch                        = 1288834974657L
   private[this] val sequenceBits     = 12L

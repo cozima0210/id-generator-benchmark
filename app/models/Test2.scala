@@ -1,21 +1,37 @@
 package models
 
-import scalikejdbc._
+import javax.inject.{Inject, Singleton}
+import play.api.db.slick.DatabaseConfigProvider
+import slick.jdbc.JdbcProfile
+
+import scala.concurrent.{ExecutionContext, Future}
 
 case class Test2(
   id:   Id[Test2],
   name: String
 ) extends HasId[Test2]
 
-object Test2 extends SQLSyntaxSupport[Test2] {
+@Singleton
+class Test2Repository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  override def tableName = "test2"
+  private val dbConfig = dbConfigProvider.get[JdbcProfile]
 
-  def defaultAlias = syntax("t2")
+  import dbConfig._
+  import profile.api._
 
-  def create(name: String)(implicit g: IdGenerator, s: DBSession = autoSession): Int = {
+  private class Test2Table(tag: Tag) extends Table[Test2](tag, "test2") {
 
-    val c = column
-    withSQL(insert.into(Test2).namedValues(c.id -> Id[Test2].value, c.name -> name)).update().apply()
+    def id = column[Id[Test2]]("id", O.PrimaryKey)
+
+    def name = column[String]("name")
+
+    def * = (id, name) <> (Test2.tupled, Test2.unapply)
   }
+
+  private val test2 = TableQuery[Test2Table]
+
+  def create(id: Id[Test2], name: String): Future[Int] = db.run {
+    test2.map(t => (t.id, t.name)) += (id, name)
+  }
+
 }
